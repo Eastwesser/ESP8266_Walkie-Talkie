@@ -1,49 +1,41 @@
-# ESP8266 WiFi Walkie-Talkie
-**ESP8266 WiFi Walkie-Talkie** is a project that allows you to create a simple walkie-talkie using ESP8266 modules with Wi-Fi communication between two devices. The project includes using **DFPlayer Mini** to play sound signals upon connection.
+# ESP8266 Walkie-Talkie SeRWaL
 
-## Description
-The project is divided into two parts:
+This project implements a simple walkie-talkie system using two ESP8266 boards. It uses UDP communication to transmit and receive audio data between the devices.
 
-- Access Point (AP): One ESP8266 device acts as an access point, to which the other device (Client) connects.
-- Client: The second ESP8266 device connects to the Access Point and can send and receive messages, while playing sound signals.
+## Features
+- Two-way audio communication.
+- One ESP8266 acts as an **Access Point (Server)**.
+- The other ESP8266 acts as a **Client**.
+- Transmit audio using a microphone and play it back using a speaker.
+- LED indication for transmitting/receiving status.
 
-## Hardware Required
-- 2 ESP8266 boards
-- 2 DFPlayer Mini modules
-- Piezo buzzers or small speakers
-- SD cards for storing MP3 files
-- Wires and resistors
-- Power supply for the ESP8266
+## Hardware Requirements
+1. Two ESP8266 boards.
+2. Electret microphone module (connected to `A0` pin).
+3. Speaker or buzzer (connected to `D5` pin).
+4. Push button (connected to `D6` pin).
+5. LED for indication (connected to `D7` pin).
 
-## Wiring
-DFPlayer Mini:
-- RX connects to D5 on the ESP8266
-- TX connects to D6 on the ESP8266
-- VCC and GND connect to power
+## Circuit Diagram
+- Connect the microphone to the `A0` pin.
+- Connect the speaker to the `D5` pin.
+- Connect the button to the `D6` pin.
+- Connect the LED to the `D7` pin with a 220-ohm resistor.
 
-## Libraries Used
-- ESP8266WiFi — Built-in library for Wi-Fi functionality on the ESP8266.
-- SoftwareSerial — Built-in library to create additional software serial ports.
-- DFPlayerMini_Fast — A library for interacting with the DFPlayer Mini module.
-
-## Installation
-### 1. Setting Up the Environment
-- Ensure that you have the latest version of Arduino IDE installed.
-- Set up your development environment for the ESP8266 by installing the ESP8266 board support.
-
-### 2. Installing Libraries
-- To work with this project, you will need the following libraries:
-- DFPlayerMini_Fast: This can be installed via the Library Manager in Arduino IDE.
-
-### 3. Uploading the Code
-- Download or clone the project repository.
-- Open esp_walkie_talkie_ap.ino for the Access Point device, and esp_walkie_talkie_cli.ino for the Client device in Arduino IDE.
-- Connect your ESP8266 boards to your computer.
-- Select the appropriate board and port in Arduino IDE.
-- Upload the corresponding code to each board.
+## Software Setup
+1. Install the Arduino IDE.
+2. Install the ESP8266 board support package in the Arduino IDE.
+3. Load the `server.ino` file onto the **Server ESP8266**.
+4. Load the `client.ino` file onto the **Client ESP8266**.
 
 ## Usage
-- Load the esp_walkie_talkie_ap.ino code onto the first ESP8266, which will act as the Access Point.
-- Load the esp_walkie_talkie_cli.ino code onto the second ESP8266, which will act as the Client.
-- The devices will automatically start communicating over Wi-Fi once connected.
-- The DFPlayer Mini module will play a sound when a connection is established between the two devices.
+1. Power on both devices.
+2. The **Server ESP8266** creates a Wi-Fi network named `WalkieTalkieAP`.
+3. The **Client ESP8266** connects to this network automatically.
+4. Press the button on one device to transmit audio.
+5. Release the button to receive audio from the other device.
+
+## Notes
+- Ensure both devices are within Wi-Fi range for communication.
+- Adjust the microphone and speaker sensitivity if needed for better audio quality.
+- Use `Serial Monitor` for debugging purposes.
