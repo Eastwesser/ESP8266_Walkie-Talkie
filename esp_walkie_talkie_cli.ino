@@ -1,52 +1,78 @@
 #include <ESP8266WiFi.h>
-#include <SoftwareSerial.h>
-#include <DFPlayerMini_Fast.h>
+#include <WiFiUdp.h>
 
-SoftwareSerial mySerial(D5, D6); // RX (D5) подключаем к TX DFPlayer, TX (D6) к RX DFPlayer
-DFPlayerMini_Fast myMP3;
+WiFiUDP udp;
+const int port = 12345;  // UDP port for communication
 
-const char* ssid = "ESP8266_AP";
-const char* password = "password";
+const int micPin = A0;       // Microphone pin
+const int buttonPin = D6;    // Button pin
+const int speakerPin = D5;   // Speaker pin
+const int ledPin = D7;       // LED pin for indication
+
+const char* ssid = "WalkieTalkieAP";       // Network SSID
+const char* password = "password123";     // Network password
+
+IPAddress serverIP;  // Server's IP address
 
 void setup() {
   Serial.begin(115200);
-  
+
+  // Connect to the server's AP
   WiFi.begin(ssid, password);
-  
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
-    Serial.println("Connecting to Access Point...");
+    Serial.println("Connecting to AP...");
   }
-  
-  Serial.println("Connected to Access Point");
-  Serial.print("IP address: ");
-  Serial.println(WiFi.localIP());
-  
-  // Настройка MP3 плеера
-  mySerial.begin(9600);
-  myMP3.begin(mySerial);
-  myMP3.volume(10); // Установить громкость 0-30
+  Serial.println("Connected to AP");
+
+  // Get server's IP (typically the gateway)
+  serverIP = WiFi.gatewayIP();
+  Serial.printf("Server IP: %s\n", serverIP.toString().c_str());
+
+  // Start UDP
+  udp.begin(port);
+
+  // GPIO setup
+  pinMode(buttonPin, INPUT_PULLUP);
+  pinMode(ledPin, OUTPUT);
+  pinMode(speakerPin, OUTPUT);
+  digitalWrite(ledPin, LOW);
+
+  Serial.println("Ready to transmit/receive audio.");
 }
 
 void loop() {
-  WiFiClient client;
-  
-  if (client.connect(WiFi.gatewayIP(), 80)) {
-    Serial.println("Connected to Server.");
-    myMP3.play(2); // Воспроизвести сигнал при подключении к серверу
-    
-    // Здесь можно добавить логику для отправки данных на сервер или получения данных
-    client.print("Hello Server!");
-    
-    while (client.connected()) {
-      if (client.available()) {
-        char c = client.read();
-        Serial.write(c);
-        // Можно обрабатывать данные от сервера и воспроизводить аудио
+  if (digitalRead(buttonPin) == LOW) {
+    // Transmitting mode
+    digitalWrite(ledPin, HIGH);
+
+    // Read microphone value
+    int micValue = analogRead(micPin);
+    char buffer[10];
+    sprintf(buffer, "%d", micValue);
+
+    // Send audio data to the server
+    udp.beginPacket(serverIP, port);
+    udp.write(buffer);
+    if (!udp.endPacket()) {
+      Serial.println("Error sending packet to server");
+    }
+    delay(10);
+  } else {
+    // Receiving mode
+    digitalWrite(ledPin, LOW);
+
+    int packetSize = udp.parsePacket();
+    if (packetSize) {
+      char packet[255];
+      int len = udp.read(packet, sizeof(packet) - 1);
+      if (len > 0) {
+        packet[len] = '\0';
+        int soundValue = atoi(packet);
+
+        // Play sound on speaker
+        analogWrite(speakerPin, soundValue);
       }
     }
-    
-    client.stop();
-    Serial.println("Disconnected from Server.");
   }
 }
