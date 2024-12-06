@@ -4,7 +4,7 @@
 WiFiUDP udp;
 const int port = 12345;  // UDP port for communication
 
-const int micPin = A0;       // Microphone pin
+const int micPin = D1;       // Microphone pin
 const int buttonPin = D6;    // Button pin
 const int speakerPin = D5;   // Speaker pin
 const int ledPin = D7;       // LED pin for indication
