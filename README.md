@@ -11,13 +11,13 @@ This project implements a simple walkie-talkie system using two ESP8266 boards. 
 
 ## Hardware Requirements
 1. Two ESP8266 boards.
-2. Electret microphone module (connected to `A0` pin).
+2. Electret microphone module (connected to `D1` pin).
 3. Speaker or buzzer (connected to `D5` pin).
 4. Push button (connected to `D6` pin).
 5. LED for indication (connected to `D7` pin).
 
 ## Circuit Diagram
-- Connect the microphone to the `A0` pin.
+- Connect the microphone to the `D1` pin.
 - Connect the speaker to the `D5` pin.
 - Connect the button to the `D6` pin.
 - Connect the LED to the `D7` pin with a 220-ohm resistor.
